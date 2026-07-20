@@ -8,6 +8,8 @@
  *
  * const login = await chat.login("bob", "password");
  * const channels = await chat.getChannels();
+ *
+ * await chat.sendMessage(1, "Hello!");
  */
 
 class Chatify {
@@ -28,6 +30,13 @@ class Chatify {
          * @type {string|null}
          */
         this.token = null;
+
+        /**
+         * Current logged-in user ID.
+         *
+         * @type {number|null}
+         */
+        this.userId = null;
     }
 
 
@@ -95,6 +104,7 @@ class Chatify {
 
         if (result.success) {
             this.token = result.session_token;
+            this.userId = result.id;
         }
 
         return result;
@@ -166,18 +176,25 @@ class Chatify {
     /**
      * Send a message.
      *
+     * Uses the ID from the logged-in user automatically.
+     *
      * @param {number} channelID
      * @param {string} content
-     * @param {number} author
      *
      * @returns {Promise<Object>}
      */
-    sendMessage(channelID, content, author) {
+    sendMessage(channelID, content) {
+        if (!this.userId) {
+            throw new Error(
+                "You must login before sending messages."
+            );
+        }
+
         return this.request(`/channels/${channelID}/send`, {
             method: "POST",
             body: {
                 content,
-                author
+                author: this.userId
             }
         });
     }
@@ -194,12 +211,19 @@ class Chatify {
 
 
     /**
-     * Log out and remove token.
+     * Log out and remove authentication data.
      */
     logout() {
         this.token = null;
+        this.userId = null;
     }
 }
 
 
-export default Chatify;
+/**
+ * Expose globally for normal script tags.
+ *
+ * Example:
+ * const chat = new Chatify();
+ */
+window.Chatify = Chatify;
