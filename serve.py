@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import Depends, FastAPI, HTTPException, Request
 from pathlib import Path
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -6,6 +8,7 @@ from chatify.app import ChatApp
 from chatify.types.channel import ChannelMetadata
 from chatify.types.json_types.auth import LoginRequest, LoginReturn
 from chatify.types.json_types.channels import FoundChannels, NewChannel, NewChannelReturn
+from chatify.types.json_types.reading import ReadRequestReturn
 from chatify.types.json_types.sending import SendRequest
 from chatify.types.user import User
 
@@ -60,10 +63,25 @@ async def get_current_user(
 
     return user
 
+@app.get("/channels/{channel_num}/read")
+async def read(channel_num: int, user: User = Depends(get_current_user), limit: int=50) -> ReadRequestReturn:
+    msgs = await chat.channels.load_channel(channel_num)
+
+    if not msgs:
+        raise HTTPException(500)
+    
+    return ReadRequestReturn(
+        messages=await asyncio.gather(
+            *[
+                chat.messages.export_message(msg)
+                for msg in msgs.messages[:limit]
+            ]
+        )
+    )
 @app.post("/channels/{channel_num}/send")
 async def on_send(request: SendRequest, 
                   channel_num: int,
-                  user: HTTPAuthorizationCredentials = Depends(get_current_user)):
+                  user: User = Depends(get_current_user)):
     '''Sends a message to a channel number'''
 
     
