@@ -2,6 +2,7 @@ from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from fastapi import Response
 from fastapi.responses import HTMLResponse
 
 
@@ -17,6 +18,16 @@ class FileManager:
         name.mkdir(exist_ok=True, parents=True)
         return name
     
+
+    def find(self, namespace: str, value: str, media_type: str) -> Response | None:
+        '''Looks inside a namespace for a file.'''
+        for file in (self.parent.config._folder / namespace).glob("*"):
+            if file.name == value:
+                return Response(
+                    content = file.read_text(),
+                    media_type=media_type
+                )
+            
     def load_template(self, name: str) -> str | None:
         '''Loads an HTML file from /templates. Use .return_template if passed directly into a return call for FastAPI.'''
         for file in self.template_folder.glob("*.html"):
@@ -24,7 +35,8 @@ class FileManager:
                 continue
             root_name = file.stem
             if root_name == name:
-                return file.read_text()
+                text = file.read_text()
+                return text
     
         return None
     

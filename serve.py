@@ -28,6 +28,15 @@ async def root(page: str):
     '''Loads a page from /templates'''
     return chat.files.return_template(page)
 
+
+@app.get("/css/{css}")
+async def css(css: str):
+    return chat.files.find("css", css, "text/css")
+
+@app.get("/scripts/{scripts}")
+async def scripts(scripts: str):
+    return chat.files.find("scripts", scripts, "application/javascript")
+
 @app.exception_handler(404)
 async def not_found(request: Request, exc):
     return chat.files.return_status(404)
@@ -36,7 +45,7 @@ async def not_found(request: Request, exc):
 async def server_error(request: Request, exc):
     return chat.files.return_status(500)
 
-@app.post("/api/login/{user}")
+@app.post("/api/login")
 async def on_login(request: LoginRequest) -> LoginReturn:
     username = request.username
     password = request.password
@@ -114,6 +123,7 @@ async def get_channels(limit: int = 50) -> FoundChannels:
     '''Gets the channels.'''
     channels = chat.channels.channel_ids[0:limit]
     return FoundChannels(channels=channels)
+
 @app.post("/channels/new")
 async def on_new_channel(request: NewChannel, user: HTTPAuthorizationCredentials = Depends(get_current_user)) -> NewChannelReturn:
     chl = await chat.channels.new_channel(ChannelMetadata(name=request.name, description=request.description))
