@@ -1,0 +1,194 @@
+/* the defaults are better this way */
+body {
+    margin: 0%; /* ffs */
+}
+hr {
+    height: 3px;
+    border: none;
+}
+:root {
+    /* Chat */
+    --chat-color: rgb(255, 155, 255);
+
+    /* Sidebar */
+    --sidebar-color: rgb(255, 55, 150);
+
+    /* Selector Colors */
+    --select-color: rgb(255, 100, 255);
+    --select-button: rgb(225, 150, 255);
+    --select-border-color: rgb(103, 0, 129);
+    --select-hover-color: white;
+    --select-active-color: rgb(212, 200, 255);
+}
+
+
+/* Layout Setup */
+.sidebar {
+    background-color: var(--sidebar-color);
+
+    min-width: 250px;
+    width: 15vw;
+    height: calc(100vh - 10px);
+    position: fixed;
+
+    padding: 5px;
+    /* z-index: 1; */ /* ALREADY ORDERED!!!! */
+}
+
+.sidebar hr {
+    background-color: var(--select-border-color);
+}
+
+.chat {
+    background-color: var(--chat-color);
+    height: calc(100vh - 10px);
+
+    /* width: max(calc(100% - 250px), 85%); */
+    width: calc(100% - max(250px, 15vw));
+    position:fixed;
+    left: calc(max(250px, 15vw) + 10px);
+
+    padding: 5px;
+}
+
+
+/* Chat Bar Setup */
+.chatBar {
+    position: absolute;
+    
+    background-color: white;
+    width: 90%;
+    height: max(8%, 75px);
+    bottom: 20px;
+    left: 5%;
+
+    border: 5px;
+    border-style: ridge;
+    border-color: var(--select-border-color);
+}
+#sendButton {
+    position: relative;
+
+    width: 10%;
+    height: 100%;
+  
+    left: 90%;
+  
+    border: none;
+    border-left-style: ridge;
+    border-left-width: 5px;
+    border-left-color: var(--select-border-color);
+  
+    background-color: var(--select-color);
+}
+#sendButton:hover {
+  background-color: var(--select-hover-color);
+}
+#sendButton:active {
+  background-color: var(--select-active-color);
+}
+
+/* SIDEBAR STYLING */
+.sidebarChannel {
+    width: 100%;
+    height: 50px;
+
+    font-size: 100%;
+    font-weight: bold;
+
+    margin-bottom: 5px;
+    
+    border: 5px;
+    border-style:ridge;
+    border-color: var(--select-border-color);
+
+    background-color: var(--select-button);
+}
+.sidebarChannel:hover {
+    background-color: var(--select-hover-color);
+}
+.sidebarChannel:active {
+    background-color: var(--select-active-color);
+}
+
+.channelSelector {
+    background-color: var(--select-color);
+    
+    padding: 10px;
+
+    width: calc(100% - 30px);
+    height: calc(100% - 2.2rem - 59px - 5px - 20px); /* goodbye cruel world */
+
+    border: 5px;
+    border-color: var(--select-border-color);
+    border-style: ridge;
+
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: var(--select-border-color) rgba(2, 2, 2, 0);
+}
+
+#LOBBY_NAME {
+    width: 100%;
+    /* height: 50px; */
+    margin: 0%;
+
+    text-align: center;
+    text-wrap: unset;
+    font-weight: bold;
+    font-size: 2.2rem;
+}
+#topSidebar {
+    margin-bottom: 5px;
+}
+
+#LobbyControls {
+    height: 40px;
+}
+#holderFUCK {
+    height: calc(100% - 75px);
+    padding-bottom: 15px;
+}
+
+.profileArea {
+    height: 45px;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+.profileArea p {
+    margin: 0%;
+}
+
+.profile {
+    height: 100%;
+    width: 60%;
+    background-color: white;
+}
+#photophoto {
+    height: 41px;
+    width: 41px;
+    border: 2px;
+    border-color: var(--select-border-color);
+    border-style: ridge;
+    margin-right: 5px;
+}
+#usernamePart {
+    position: relative;
+    width: calc(100% - 60px);
+    left: 55px;
+    bottom: calc(
+        calc(45px/2) + 1rem);
+    margin: 0px;
+
+    font-size: 100%;
+}
+#versionCopyright {
+    position: relative;
+    font-weight: bold;
+    font-size: 150%;
+    width: calc(40% - 10px);
+    left: calc(60% + 10px);
+    margin: 0px;
+    bottom: calc(1.5rem);
+}
