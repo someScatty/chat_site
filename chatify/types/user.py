@@ -15,7 +15,7 @@ class Token:
         value = secrets.token_urlsafe(64)
 
         return cls(
-            value=value,
+            value=f"Bearer {value}",
             expiration_time=exp_time
         )
 

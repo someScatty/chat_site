@@ -41,7 +41,7 @@ class UserManager:
     def _dump_token(self, tkn: Token) -> dict:
         '''Gets JSON data for a token'''
         return {
-            "expiration_date": tkn.expiration_time,
+            "expires": tkn.expiration_time,
             "value": tkn.value
         }
     
@@ -59,7 +59,7 @@ class UserManager:
     def _load_token(self, data: dict) -> Token:
         '''Loads a session token based off the data dict'''
         return Token(
-            expiration_time=data["expiration_time"],
+            expiration_time=data["expires"],
             value=data["value"]
         )
     def _load_user(self, data: dict) -> User:
@@ -85,7 +85,7 @@ class UserManager:
         '''Loads all saved users'''
         data = self.parent.config.load_custom(self._save_location)
         for id, raw_usr in data.items():
-            self.users[id] = self._load_user(raw_usr)
+            self.users[int(id)] = self._load_user(raw_usr)
 
 
     def exists(self, username: str) -> bool:
@@ -101,7 +101,7 @@ class UserManager:
     ) -> User:
         '''Generates a new user'''
         if self.exists(username):
-            return self.get_user(username=username)
+            return self.get_user(username=username) # type: ignore
         
         token = self.parent.security.secure_hash(password)
 
@@ -119,6 +119,9 @@ class UserManager:
         '''Generates a valid session token. Duration is in SECONDS before it expires.'''
         usr = self.get_user(id=user)
         tkn = Token.generate(duration)
+
+        if not usr:
+            raise
 
         usr.session_tokens.append(tkn)
         self.save_all()

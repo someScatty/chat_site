@@ -18,6 +18,11 @@ class SecurityLib:
         '''Generates a user token'''
         return secrets.randbits(64)
     
+    def validate_password(self, hash: str, password: str) -> bool:
+        '''Validates a password with its respective hash'''
+        verified = self.ph.verify(hash, password)
+        return verified
+    
     def hash(self, 
              data: bytes | str,
              hash_type: Literal["sha1", "sha256", "md5", "crc32"] = "sha256"

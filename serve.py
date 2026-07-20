@@ -47,8 +47,8 @@ async def on_send(request: SendRequest,
         )
 
 if __name__ == "__main__":
-
-    chat.users.create_user("moakdoge","1234")
+    usr = chat.users.create_user("moakdoge","1234")
+    chat.users.generate_session_token(usr.id,duration=1800)
     chat.users.save_all()
     uvicorn.run(
         app=app,
