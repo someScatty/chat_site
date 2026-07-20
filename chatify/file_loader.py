@@ -1,3 +1,4 @@
+from functools import cache
 from pathlib import Path
 
 from fastapi.responses import HTMLResponse
@@ -10,7 +11,6 @@ class FileManager:
     def template_folder(self) -> Path:
         name = config.get()._folder / "templates"
         name.mkdir(exist_ok=True, parents=True)
-
         return name
     
     def load_template(self, name: str) -> str | None:

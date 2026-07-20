@@ -15,7 +15,6 @@ async def root(page: str):
 async def not_found(request: Request, exc):
     return fileManager.return_status(404)
 
-
 @app.exception_handler(500)
 async def server_error(request: Request, exc):
     return fileManager.return_status(500)
