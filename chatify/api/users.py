@@ -12,19 +12,30 @@ class UserManager:
         self.users: dict[UserID, User] = {}
         self.load_all()
 
-    def get_user(self, id: UserID) -> User:
-        '''Gets a user by a user ID'''
-        user = self.users.get(id, None)
+    def get_user(self, *, id: UserID | None = None, username: str | None = None) -> User | None:
+        '''Gets a user by a user ID or username'''
 
-        if user is None:
-            raise Exception("I have no idea how the fuck to handle this")
-        
-        return user
+        if id is not None:
+            user = self.users.get(id, None)
+
+            if user is None:
+               return None
+               # raise Exception("I have no idea how the fuck to handle this")
+            
+            return user
+
+
+        if username is not None:
+            found = [usr for usr in self.users.values() if usr.username == username]
+
+            if len(found) == 0:
+                return None
+            return found[0]
+        raise Exception("please provide id or username")
     
-
     @property
     def _save_location(self):
-        return self.parent.config._folder / "users.json"
+        return "users.json"
     
 
     def _dump_token(self, tkn: Token) -> dict:
@@ -67,18 +78,49 @@ class UserManager:
         
         for id, usr in self.users.items():
             fixed_users[id] = self._dump_user(usr)
-        
-        with open(self._save_location, "w") as f:
-            f.write(json.dumps(fixed_users))        
+
+        self.parent.config.save_custom(self._save_location, fixed_users) 
 
     def load_all(self):
         '''Loads all saved users'''
-        data = {}
-        if not self._save_location.exists():
-            return
-        
-        with open(self._save_location, "r") as f:
-            data = json.loads(f.read())
-    
+        data = self.parent.config.load_custom(self._save_location)
         for id, raw_usr in data.items():
             self.users[id] = self._load_user(raw_usr)
+
+
+    def exists(self, username: str) -> bool:
+        '''Checks if a user exists'''
+        usr = self.get_user(username=username)
+
+        return (usr is not None)
+
+    def create_user(
+        self,
+        username: str,
+        password: str
+    ) -> User:
+        '''Generates a new user'''
+        if self.exists(username):
+            return self.get_user(username=username)
+        
+        token = self.parent.security.secure_hash(password)
+
+        new_user = User(
+            username=username,
+            token=token,
+            session_tokens=[],
+            id=self.parent.security.secure_usertoken()
+        )
+
+        self.users[new_user.id] = new_user
+        return new_user
+    
+    def generate_session_token(self, user: UserID, duration: int = 1800) -> Token:
+        '''Generates a valid session token. Duration is in SECONDS before it expires.'''
+        usr = self.get_user(id=user)
+        tkn = Token.generate(duration)
+
+        usr.session_tokens.append(tkn)
+        self.save_all()
+
+        return tkn

@@ -10,6 +10,7 @@ app = FastAPI(
     version="0.0.1a"
 )
 chat = ChatApp(Path(__file__).parent / "config")
+chat.config.debug = True
 security = HTTPBearer()
 
 @app.get("/{page}")
@@ -46,6 +47,9 @@ async def on_send(request: SendRequest,
         )
 
 if __name__ == "__main__":
+
+    chat.users.create_user("moakdoge","1234")
+    chat.users.save_all()
     uvicorn.run(
         app=app,
         host=chat.config.host,
