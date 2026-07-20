@@ -2,7 +2,7 @@ import sys
 import json
 import requests
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 4:
     print("Usage: python cli.py <channel_id> <content> <user>")
     sys.exit(1)
 

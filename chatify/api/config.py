@@ -38,6 +38,7 @@ class Config:
     
     def __init__(self, base: Path, parent: "ChatApp") -> None:
         self._folder = base
+        self._folder.mkdir(exist_ok=True, parents=True)
         self._parent = parent
         self.host: str = os.getenv("HOST", "0.0.0.0")
         self.port: int = int(os.getenv("PORT", "8000"))

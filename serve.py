@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from pathlib import Path
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import uvicorn
 from chatify.app import ChatApp
 from chatify.types.json_types.sending import SendRequest
@@ -8,7 +9,8 @@ app = FastAPI(
     description="Some chat app idk lmao",
     version="0.0.1a"
 )
-chat = ChatApp(Path(__file__).parent)
+chat = ChatApp(Path(__file__).parent / "config")
+security = HTTPBearer()
 
 @app.get("/{page}")
 async def root(page: str):
@@ -24,7 +26,9 @@ async def server_error(request: Request, exc):
     return chat.files.return_status(500)
 
 @app.post("/channels/{channel_num}/send")
-async def on_send(request: SendRequest, channel_num: int, ):
+async def on_send(request: SendRequest, 
+                  channel_num: int,
+                  credentials: HTTPAuthorizationCredentials = Depends(security)):
     '''Sends a message to a channel number'''
 
     msg_contents = request.content
