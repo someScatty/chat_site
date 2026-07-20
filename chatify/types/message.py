@@ -8,7 +8,6 @@ class Message(NamedTuple):
 
     #Essential
     id: MessageID
-    room: RoomID
     channel: ChannelID
 
     #optional / nice to have
