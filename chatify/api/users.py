@@ -12,6 +12,8 @@ class UserManager:
         self.users: dict[UserID, User] = {}
         self.load_all()
 
+        self.parent.on_exit(self._on_exit)
+
     def get_user(self, *, id: UserID | None = None, username: str | None = None) -> User | None:
         '''Gets a user by a user ID or username'''
 
@@ -127,3 +129,26 @@ class UserManager:
         self.save_all()
 
         return tkn
+    
+    def login(self, username: str, password: str) -> tuple[User, Token] | None:
+        '''
+        Atempts to log in a user; returns None if password is wrong or user is not found
+        Also will generate a valid session token
+        '''
+        usr = self.get_user(username=username)
+
+        if usr is None:
+            return None
+        
+        verified = self.parent.security.validate_password(usr.token, password)
+
+        if not verified:
+            return None
+        
+        token = Token.generate(1800) #30 min
+        return usr, token
+    
+        
+
+    def _on_exit(self):
+        self.save_all()

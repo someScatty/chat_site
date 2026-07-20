@@ -57,6 +57,7 @@ class Config:
             return json.load(f)
                  
     def __init__(self, base: Path, parent: "ChatApp", debug: bool = False) -> None:
+        parent.on_exit(self._on_exit)
         self._folder = base
         self._folder.mkdir(exist_ok=True, parents=True)
         self._parent = parent
@@ -70,6 +71,11 @@ class Config:
         '''
 
         self._load()
+        self._save()
+
+
+
+    def _on_exit(self):
         self._save()
 
     def __enter__(self):

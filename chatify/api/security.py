@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Literal
 
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 import zlib, hashlib, secrets
 
 if TYPE_CHECKING:
@@ -20,7 +21,10 @@ class SecurityLib:
     
     def validate_password(self, hash: str, password: str) -> bool:
         '''Validates a password with its respective hash'''
-        verified = self.ph.verify(hash, password)
+        try:
+            verified = self.ph.verify(hash, password)
+        except VerifyMismatchError:
+            return False
         return verified
     
     def hash(self, 
