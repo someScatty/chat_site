@@ -14,7 +14,7 @@ response = requests.post(
     f"http://127.0.0.1:8000/channels/{channel}/send",
     json={
         "content": data,
-        "user": user
+        "author": user
     }
 )
 

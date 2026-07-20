@@ -18,7 +18,6 @@ class ChannelSubsystem:
     async def load_channel(self, channelID: ChannelID) -> Channel | None:
         return self.CACHE.get(channelID, None)
     
-
     async def register_message(self,channelID: ChannelID, message: Message):
         chan = await self.load_channel(channelID)
         if chan is None:
