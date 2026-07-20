@@ -1,4 +1,5 @@
 import asyncio
+from functools import lru_cache
 import json
 import time
 from typing import TYPE_CHECKING
@@ -149,6 +150,7 @@ class UserManager:
             return None
         
         token = Token.generate(1800) #30 min
+        usr.session_tokens.append(token)
         return usr, token
     
 
@@ -158,8 +160,21 @@ class UserManager:
             usr.session_tokens = [_ for _ in usr.session_tokens if not _.expired]
 
 
-    def verify(self, user: UserID, session: str) -> bool:
+    @lru_cache()
+    def get_id_from_session(self, session: str) -> UserID | None:
+        '''Gets a user ID from a session'''
+       
+        for id, user in self.users.items():
+            for ses in user.session_tokens:
+                if ses.value == session:
+                    return id
+        return None
+    
+    def verify(self, session: str, user: UserID | None = None) -> bool:
         '''Checks if a session token is valid'''
+
+        if user is None:
+            user = self.get_id_from_session(session)
         usr = self.get_user(id=user)
 
         if usr is None:

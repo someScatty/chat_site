@@ -50,7 +50,8 @@ async def on_send(request: SendRequest,
                   credentials: HTTPAuthorizationCredentials = Depends(security)):
     '''Sends a message to a channel number'''
 
-    print(credentials.credentials)
+    valid = chat.users.verify(credentials.credentials)
+    print("VALID: ", valid)
     msg_contents = request.content
     channel_info = await chat.channels.load_channel(channel_num)
     if channel_info:

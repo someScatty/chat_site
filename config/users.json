@@ -2,7 +2,20 @@
   "15496218509984489678": {
     "username": "moakdoge",
     "token": "$argon2id$v=19$m=65536,t=3,p=4$CDUUrMYq4IkvFDZdm3kmVw$JTRPb++SdCn6ALNBGyzYKCXG25FOLQL98Y5EPFCW3sY",
-    "session_tokens": [],
+    "session_tokens": [
+      {
+        "expires": 1784573652,
+        "value": "Bearer YJXE3mVyVbEJQSIFGCbrGaQBdTrByzAT7ji9oIQxOs2lbcFLAXluh9yLEOxXwMaQOPDWecGGhkWcm0H3Dye3-A"
+      },
+      {
+        "expires": 1784573653,
+        "value": "Bearer 7QLFYGoQocupljc3PYqG4orQ2ERm3_1xqK0VOX92XTOhrW1kVKm2pBFtvyO8Xu0CbHeHwTk7q8sLvUHNBn_VsQ"
+      },
+      {
+        "expires": 1784573715,
+        "value": "Bearer q4MYzrOjB6owPY1XyR1B34LaHiyQzFNOwMzzzF8odOptjR5eb1qHKw4xgYOxCBfbuZTY-JTO-2xSd636aorEFw"
+      }
+    ],
     "id": 15496218509984489678
   }
 }
