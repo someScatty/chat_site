@@ -186,9 +186,20 @@ hr {
 #versionCopyright {
     position: relative;
     font-weight: bold;
-    font-size: 150%;
+    font-size: 100%;
     width: calc(40% - 10px);
     left: calc(60% + 10px);
     margin: 0px;
-    bottom: calc(1.5rem);
+    bottom: calc(1rem);
+}
+#otherVersion {
+    position: relative;
+    font-style: italic;
+    font-size: 100%;
+    width: calc(40% - 10px);
+    left: calc(60% + 10px);
+    margin: 0px;
+    bottom: calc(3.5rem);
+
+    color: var(--select-border-color);
 }
