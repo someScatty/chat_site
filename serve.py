@@ -11,7 +11,7 @@ from chatify.types.json_types.channels import FoundChannels, NewChannel, NewChan
 from chatify.types.json_types.reading import ReadRequestReturn
 from chatify.types.json_types.sending import SendRequest
 from chatify.types.json_types.user import UserObject
-from chatify.types.user import User
+from chatify.types.user import Token, User
 
 chat = ChatApp(Path(__file__).parent / "config")
 app = FastAPI(
@@ -59,6 +59,23 @@ async def on_login(request: LoginRequest) -> LoginReturn:
         id=user.id,
         error=""
     )
+
+@app.post("/api/signUp")
+async def on_signup(request: LoginRequest) -> LoginReturn:
+    username = request.username
+    password = request.password
+    output = chat.users.create_user(username, password)
+    
+    session=Token.generate(1800) # 30min
+    output.session_tokens.append(session)
+
+    return LoginReturn(
+        success=True,
+        session_token=session.value,
+        id=output.id,
+        error=""
+    )
+    
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)

@@ -110,6 +110,36 @@ class Chatify {
         return result;
     }
 
+    /**
+     * Sign up for Chatify.
+     *
+     * @param {string} username
+     * @param {string} password
+     *
+     * @returns {Promise<{
+     * success:boolean,
+     * session_token:string,
+     * id:number,
+     * error:string
+     * }>}
+     */
+    async signUp(username, password) {
+        const result = await this.request("/api/signUp", {
+            method: "POST",
+            body: {
+                username,
+                password
+            }
+        });
+
+        if (result.success) {
+            this.token = result.session_token;
+            this.userId = result.id;
+        }
+
+        return result;
+    }
+
 
     /**
      * Get user information.
