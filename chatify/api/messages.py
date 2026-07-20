@@ -47,7 +47,6 @@ class MessageLib:
         messageOBJ = Message(
             content=content,
             author=author,
-            channel=channel,
             id=id,
             timestamp=timestamp,
             attachments=()

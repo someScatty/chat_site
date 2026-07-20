@@ -1,8 +1,9 @@
+from functools import lru_cache
+
 import requests
 import time
 
 BASE_URL = "http://127.0.0.1:8000"
-
 
 class ChatCLI:
     def __init__(self):
@@ -15,6 +16,11 @@ class ChatCLI:
         return {
             "Authorization": f"Bearer {self.token}"
         }
+    
+    @lru_cache()
+    def get_user_data(self, id: int):
+        d=requests.get(f"{BASE_URL}/users/{id}", headers=self.headers())
+        return d.json()
 
     def login(self):
         username = "moakdoge"
@@ -94,9 +100,9 @@ class ChatCLI:
 
             if msg_id not in self.seen_messages:
                 self.seen_messages.add(msg_id)
-
+                user_info = self.get_user_data(msg["author"])
                 print(
-                    f"\n[{msg["author"]}] {msg["content"]}"
+                    f"\n[{user_info["username"]}] {msg["content"]}"
                 )
 
     def send_message(self, content):

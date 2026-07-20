@@ -10,6 +10,7 @@ from chatify.types.json_types.auth import LoginRequest, LoginReturn
 from chatify.types.json_types.channels import FoundChannels, NewChannel, NewChannelReturn
 from chatify.types.json_types.reading import ReadRequestReturn
 from chatify.types.json_types.sending import SendRequest
+from chatify.types.json_types.user import UserObject
 from chatify.types.user import User
 
 chat = ChatApp(Path(__file__).parent / "config")
@@ -62,6 +63,17 @@ async def get_current_user(
         )
 
     return user
+
+@app.get("/users/{user_id}")
+async def get_user_info(user_id: int, user: User = Depends(get_current_user)) -> UserObject:
+    usr = chat.users.get_user(id=user_id)
+
+    if usr is None:
+        raise HTTPException(403)
+
+    return UserObject(
+        username=usr.username
+    )
 
 @app.get("/channels/{channel_num}/read")
 async def read(channel_num: int, user: User = Depends(get_current_user), limit: int=50) -> ReadRequestReturn:

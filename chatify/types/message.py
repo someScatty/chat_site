@@ -8,7 +8,6 @@ class Message(NamedTuple):
 
     #Essential
     id: MessageID
-    channel: ChannelID
 
     #optional / nice to have
     attachments: tuple[AttachmentID, ...]
