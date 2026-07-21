@@ -119,6 +119,9 @@ class UserManager:
         )
 
         self.users[new_user.id] = new_user
+
+        # cant believe this was forgotten -scatty
+        self.save_all()
         return new_user
     
     def generate_session_token(self, user: UserID, duration: int = 1800) -> Token:
@@ -151,6 +154,9 @@ class UserManager:
         
         token = Token.generate(1800) #30 min
         usr.session_tokens.append(token)
+
+        # cant believe this was forgotten -scatty
+        self.save_all()
         return usr, token
     
 

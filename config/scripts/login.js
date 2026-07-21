@@ -19,6 +19,7 @@ function redirect(extension) {
 function setCookies(tokanic) {
     document.cookie = "V2token=" + tokanic.session_token;
     document.cookie = "userID=" + tokanic.id; // theres GOTTA be a better way
+    console.log(document.cookie)
 }
 
 async function Login() {

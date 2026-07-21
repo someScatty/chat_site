@@ -10,8 +10,8 @@
     "token": "$argon2id$v=19$m=65536,t=3,p=4$CuzJrhVi4+4VzQm1WRWiVg$lUYpYla7nd7160N/SphUICs0TBZmVPLKN4K2lon9HpE",
     "session_tokens": [
       {
-        "expires": 1784605267,
-        "value": "Bearer HaAi97h2v7zI-jjRmVTtjq4kGo_KxIzGg8-X50qHCpEOl9gMTnnlzWTCrztkGqLAtAEBVaoHXsCQF9fHF8DIIg"
+        "expires": 1784617364,
+        "value": "Bearer nRlJR28aZ-xE4ljMDkZZQMXTx-zZrqV6m2iBJDTMam-mr3oxGAD-jxPgvCsqcoObjbBtNVVIm85Cw1mKLaag1A"
       }
     ],
     "id": 12539560556610424603
