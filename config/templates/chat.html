@@ -3,15 +3,12 @@
 <!-- V1 scrap -->
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="/static/main.js"></script> -->
-<script type="module">
-    import Chatify from "/scripts/api.js";
-
-    window.chatAPI = new Chatify();
-</script>
 <head>
     <link rel="stylesheet" href="/css/chat.css">
     <!-- <link rel="icon" type="image/png" id="icon" href="/static/icon.png"> -->
 </head>
+
+<script src="/scripts/chat.js" type="module"></script>
 
 <body>
     <div class="chat">
@@ -61,7 +58,8 @@
                 <img src="/static/default.jpg" id="photophoto"> <!-- cant remove, but rn theres no images... -->
                 <p id="usernamePart">@example</p>
             </div>
-            <p id="versionCopyright">TCOS v1.10</p>
+            <p id="versionCopyright">TCOS v2.0.0a</p>
+            <p id="otherVersion">v0.0.1b</p>
         </div>
     </div>
 </body>

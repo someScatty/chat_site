@@ -119,7 +119,6 @@ class UserManager:
         )
 
         self.users[new_user.id] = new_user
-        self.save_all()
         return new_user
     
     def generate_session_token(self, user: UserID, duration: int = 0) -> Token:
@@ -154,7 +153,6 @@ class UserManager:
         
         token = Token.generate(self.parent.config.timeout) #30 min
         usr.session_tokens.append(token)
-        self.save_all()
         return usr, token
     
 

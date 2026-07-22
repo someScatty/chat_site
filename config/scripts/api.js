@@ -257,3 +257,6 @@ class Chatify {
  * const chat = new Chatify();
  */
 window.Chatify = Chatify;
+
+/* oh boy i love shit not working
+please for the love of god just import the script instead of following what chat.html says, i beg you */
