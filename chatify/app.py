@@ -39,7 +39,7 @@ class ChatApp:
                 self.config._unlock()
                 self.console.warn(f"Lockfile for non-existant process found, unlocking manually...")
         self.config._lock()
-        
+
         self.channels = chatify.api.channel.ChannelSubsystem(self)
         self.messages = chatify.api.messages.MessageLib(self)
         self.files = chatify.api.files.FileManager(self)
@@ -56,11 +56,23 @@ class ChatApp:
         self.console.newline()
         self._track_setattrs = False
 
+
+    def _apply_decorators(self, obj):
+        for name in dir(obj):
+            method = getattr(obj, name)
+
+            if getattr(method, "__on_exit__", False):
+                self.on_exit(method)
+
+            if hasattr(method, "__interval__"):
+                self.schedule_task(method, getattr(method, "__interval__"))
+
     def __setattr__(self, name: str, value: Any):
         object.__setattr__(self, name, value)
         if name.startswith("_"):
             return
         if hasattr(self, "console") and self._track_setattrs:
+            self._apply_decorators(getattr(self, name))
             self.console.info(f"Loaded: {value.__module__}")
             self._mods_loaded += 1
 
@@ -86,12 +98,16 @@ class ChatApp:
 
     async def tick_tasks(self):
         await asyncio.sleep(0)
-
         while True:
+            if not self._registered_tasks:
+                await asyncio.sleep(1)
+                continue
+            now = time.monotonic()
+            minimum_time = min(_.repeat - (now - _.last_ran) for _ in self._registered_tasks)
             for task in self._registered_tasks:
                 if (
                     task.active_task is None
-                    and time.time() - task.last_ran >= task.repeat
+                    and now - task.last_ran >= task.repeat
                 ):
                     task.active_task = asyncio.create_task(
                         task.fn(*task.args)
@@ -100,7 +116,7 @@ class ChatApp:
                 if task.active_task is not None and task.active_task.done():
                     task.active_task = None
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(minimum_time)
 
 
     @asynccontextmanager

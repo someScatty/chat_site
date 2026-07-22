@@ -8,6 +8,7 @@ import secrets
 import time
 from chatify.types.core import ChannelID
 from chatify.types.channel import *
+from chatify.types.decorators import *
 from chatify.types.message import Message
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -22,8 +23,6 @@ class ChannelSubsystem:
         self._journal_cache: dict[ChannelID, TextIOWrapper] = {}
 
         self.load_all() 
-        self.parent.schedule_task(self._load_loop, repeat_interval=5)
-        self.parent.on_exit(self._on_exit)
 
 
     async def journal(self, message: Message, channel: Channel):
@@ -41,6 +40,7 @@ class ChannelSubsystem:
         file.flush()
         os.fsync(file.fileno())
 
+    @on_exit
     async def _on_exit(self):
         for id, chl in self.CACHE.copy().items():
             self.parent.console.debug(f"Unloading: {chl} ({id})")
@@ -151,7 +151,7 @@ class ChannelSubsystem:
         
         self.parent.console.error(f"Could not poll metadata for channel #{channelID}")
         raise
-    
+
     async def _unload(self, channel: Channel):
         self.parent.console.debug(f"Unloading channel #{channel.id}")
         await self.save(channel)
@@ -164,6 +164,7 @@ class ChannelSubsystem:
             os.remove(Path(io_obj.name).resolve())
             del self._journal_cache[channel.id]
 
+    @on_interval(seconds=5)
     async def _load_loop(self):
         for _, channel in self.CACHE.copy().items():
             if time.time() - channel.last_loaded > self.parent.config.lazy_load_time:

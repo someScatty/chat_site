@@ -5,6 +5,8 @@ import sys
 import uuid
 from typing import TYPE_CHECKING
 
+from chatify.types.decorators import on_exit
+
 if TYPE_CHECKING:
     from chatify.app import ChatApp
 
@@ -112,7 +114,6 @@ class Config:
         os.remove(self._lockfile)
 
     def __init__(self, base: Path, parent: "ChatApp", debug: bool = False) -> None:
-        parent.on_exit(self._on_exit)
         self._folder = base
         self._folder.mkdir(exist_ok=True, parents=True)
         self._parent = parent
@@ -132,6 +133,7 @@ class Config:
 
 
 
+    @on_exit
     def _on_exit(self):
         self._save()
 

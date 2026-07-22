@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from chatify.types.user import User, Token
 from chatify.types.core import UserID
+from chatify.types.decorators import *
 if TYPE_CHECKING:
     from chatify.app import ChatApp
 
@@ -15,8 +16,7 @@ class UserManager:
         self.users: dict[UserID, User] = {}
         self.load_all()
 
-        self.parent.on_exit(self._on_exit)
-        self.parent.schedule_task(self._asession_purge, repeat_interval=1)
+
 
 
     @lru_cache(maxsize=256)
@@ -158,7 +158,7 @@ class UserManager:
         return usr, token
     
 
-
+    @on_interval(seconds=1)
     async def _asession_purge(self):
         for id, usr in self.users.items():
             usr.session_tokens = [_ for _ in usr.session_tokens if not _.expired]
@@ -192,5 +192,6 @@ class UserManager:
             return usr
         raise
 
+    @on_exit
     def _on_exit(self):
         self.save_all()
