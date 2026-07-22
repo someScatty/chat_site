@@ -1,0 +1,10 @@
+{
+  "host": "0.0.0.0",
+  "lazy_load_time": 300,
+  "timeout": 1800,
+  "port": 8000,
+  "debug": true,
+  "product_name": "fyenid",
+  "base_404_message": "\n<!DOCTYPE html>\n<h1>Error loading normal 404 page; if you see this as a non-developer, something has gone seriously wrong!</h1><nl>\n<h2>If you are the site developer, please put a file named 404.html into your templates folder!</h2>\n        ",
+  "version": "0.0.3b"
+}

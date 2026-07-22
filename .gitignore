@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+tmp/
+config/channels/
+config/app.lock
+config/users.json
