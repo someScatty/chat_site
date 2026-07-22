@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from chatify.types.message import Message
+from fyenid.types.message import Message
 from ..core import *
 
 class ReadRequestReturn(BaseModel):

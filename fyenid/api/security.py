@@ -5,7 +5,7 @@ from argon2.exceptions import VerifyMismatchError
 import zlib, hashlib, secrets
 
 if TYPE_CHECKING:
-    from chatify.app import ChatApp
+    from fyenid.app import ChatApp
 class SecurityLib:
     def __init__(self, parent: "ChatApp") -> None:
         self.parent = parent

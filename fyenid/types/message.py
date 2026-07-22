@@ -12,3 +12,5 @@ class Message(NamedTuple):
     #optional / nice to have
     attachments: tuple[AttachmentID, ...]
     reply: MessageID | None = None
+    edited: bool = False
+    deleted: bool = False

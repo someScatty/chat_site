@@ -4,10 +4,11 @@ import json
 import time
 from typing import TYPE_CHECKING
 
-from chatify.types.user import User, Token
-from chatify.types.core import UserID
+from fyenid.types.user import User, Token
+from fyenid.types.core import UserID
+from fyenid.types.decorators import *
 if TYPE_CHECKING:
-    from chatify.app import ChatApp
+    from fyenid.app import ChatApp
 
 class UserManager:
     def __init__(self, parent: "ChatApp") -> None:
@@ -15,28 +16,27 @@ class UserManager:
         self.users: dict[UserID, User] = {}
         self.load_all()
 
-        self.parent.on_exit(self._on_exit)
-        self.parent.schedule_task(self._asession_purge, repeat_interval=1)
 
+
+
+    @lru_cache(maxsize=256)
     def get_user(self, *, id: UserID | None = None, username: str | None = None) -> User | None:
         '''Gets a user by a user ID or username'''
 
         if id is not None:
             user = self.users.get(id, None)
-
             if user is None:
                return None
                # raise Exception("I have no idea how the fuck to handle this")
-            
             return user
 
 
         if username is not None:
-            found = [usr for usr in self.users.values() if usr.username == username]
-
-            if len(found) == 0:
-                return None
-            return found[0]
+            user = next(
+                (usr for usr in self.users.values() if usr.username == username),
+                None
+            )
+            return user
         raise Exception("please provide id or username")
     
     @property
@@ -119,13 +119,12 @@ class UserManager:
         )
 
         self.users[new_user.id] = new_user
-
-        # cant believe this was forgotten -scatty
-        self.save_all()
         return new_user
     
-    def generate_session_token(self, user: UserID, duration: int = 1800) -> Token:
+    def generate_session_token(self, user: UserID, duration: int = 0) -> Token:
         '''Generates a valid session token. Duration is in SECONDS before it expires.'''
+        if duration == 0:
+            duration = self.parent.config.timeout
         usr = self.get_user(id=user)
         tkn = Token.generate(duration)
 
@@ -152,15 +151,12 @@ class UserManager:
         if not verified:
             return None
         
-        token = Token.generate(1800) #30 min
+        token = Token.generate(self.parent.config.timeout) #30 min
         usr.session_tokens.append(token)
-
-        # cant believe this was forgotten -scatty
-        self.save_all()
         return usr, token
     
 
-
+    @on_interval(seconds=1)
     async def _asession_purge(self):
         for id, usr in self.users.items():
             usr.session_tokens = [_ for _ in usr.session_tokens if not _.expired]
@@ -194,5 +190,6 @@ class UserManager:
             return usr
         raise
 
+    @on_exit
     def _on_exit(self):
         self.save_all()

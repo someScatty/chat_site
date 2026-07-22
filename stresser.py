@@ -28,13 +28,14 @@ class ChatCLI:
         password = "1234"
 
         r = self.session.post(
-            f"{BASE_URL}/api/login/{username}",
+            f"{BASE_URL}/api/login",
             json={
                 "username": username,
                 "password": password
             }
         )
 
+        print(r.content)
         data = r.json()
 
         if not data.get("success"):

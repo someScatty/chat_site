@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 
 
 if TYPE_CHECKING:
-    from chatify.app import ChatApp
+    from fyenid.app import ChatApp
 class FileManager:
     def __init__(self, parent: "ChatApp") -> None:
         self.parent = parent
