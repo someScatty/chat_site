@@ -139,6 +139,7 @@ async def on_send(request: SendRequest,
 async def get_channels(limit: int = 50) -> FoundChannels:
     '''Gets the channels.'''
     channels = chat.channels.channel_ids[0:limit]
+    print("FOUND:", channels)
     return FoundChannels(channels=channels)
 
 @app.post("/channels/new")

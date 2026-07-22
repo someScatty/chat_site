@@ -1,4 +1,8 @@
 import asyncio
+from io import TextIOWrapper
+import json
+import os
+from pathlib import Path
 import secrets
 
 import time
@@ -15,10 +19,27 @@ class ChannelSubsystem:
         self.CACHE: dict[ChannelID, Channel] = {} 
         self.parent = parent
         self.channel_ids: list[int] = []
+        self._journal_cache: dict[ChannelID, TextIOWrapper] = {}
 
-        self.load_all()
+        self.load_all() 
         self.parent.schedule_task(self._load_loop, repeat_interval=5)
         self.parent.on_exit(self._on_exit)
+
+
+    async def journal(self, message: Message, channel: Channel):
+        '''Creates a journal file'''
+        _json = json.dumps(await self.parent.messages.export_message(message))
+        metadata, messages = self._get_save_files(channelID=channel.id)
+        tmpjournal = metadata.parent / ".tmpjournal"
+        if channel.id not in self._journal_cache:
+            if not tmpjournal.exists(): # hack to make a journal file
+                tmpjournal.write_text("")
+            self._journal_cache[channel.id] = open(tmpjournal, "a")
+
+        file = self._journal_cache[channel.id]
+        file.write(_json + "\n")
+        file.flush()
+        os.fsync(file.fileno())
 
     async def _on_exit(self):
         for id, chl in self.CACHE.copy().items():
@@ -26,8 +47,9 @@ class ChannelSubsystem:
             await self._unload(chl)
 
     def load_all(self):
-        for file in (self.parent.config._folder / "channels").glob("*.json"):
-            self.channel_ids.append(int(file.stem))
+        for file in (self.parent.config._folder / "channels").glob("*"):
+            if file.is_dir():
+                self.channel_ids.append(int(file.stem))
 
     async def load_channel(self, channelID: ChannelID) -> Channel | None:
         channel = self.CACHE.get(channelID, None)
@@ -44,6 +66,7 @@ class ChannelSubsystem:
         if chan is None:
             raise
         chan.messages.append(message)
+        await self.journal(message, chan)
 
     async def export_metadata(self, metadata: ChannelMetadata) -> dict:
         '''exports channel metadata or smth idk im tired as shit just work'''
@@ -55,34 +78,78 @@ class ChannelSubsystem:
         '''Exports a channel to a JSON format'''
         return {
             "metadata": await self.export_metadata(channel.metadata),
-            "messages": [await self.parent.messages.export_message(m) for m in channel.messages],
-            "id": channel.id,            
+            "messages": [await self.parent.messages.export_message(m) for m in channel.messages],       
         }
     
+
+    def _get_save_files(self, channelID: ChannelID) -> tuple[Path, Path]:
+        '''Gets metadata and messages save folder'''
+        config = self.parent.config
+        _folder = config._folder / "channels" / str(channelID)
+        metadata = _folder / "metadata.json"
+        messages = _folder / "messages.json"
+
+        return (metadata, messages)
     async def save(self, channel: Channel):
         config = self.parent.config
-        config.save_custom(f"channels/{channel.id}.json", await self.export_channel(channel))
+        metadata, messages = self._get_save_files(channel.id)
+        data = await self.export_channel(channel)
+        config.save_custom(metadata, data["metadata"])
+        config.save_custom(messages, data["messages"])
+
 
     async def load(self, channelID: ChannelID) -> Channel:
         print("LOADING", channelID)
-        file = f"channels/{channelID}.json"
+        metadata, messages = self._get_save_files(channelID)
         config = self.parent.config
-        data = config.load_custom(file)
+        metadata_contents = config.load_custom(metadata)
+        message_contents = config.load_custom(messages)
+        tmpjournal = metadata.parent / ".tmpjournal"
 
-        if data == {}:
+        if tmpjournal.exists():
+            print(f"[WARNING]: .tmpjournal is found; loading off it")
+            _messages = []
+            with open(tmpjournal, "r") as f:
+                _lines = f.read().splitlines()
+                for line in _lines:
+                    try:
+                        _messages.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        print("[ERROR]: Failed to load message")
+            message_contents.extend(_messages) # type: ignore
+            os.remove(tmpjournal)
+        
+        data = {
+            "messages": message_contents,
+            "metadata": metadata_contents,
+            "id": channelID
+        }
+        if data["metadata"] == {}:
             raise Exception("Channel does not exist!")
+        
+
+
         self.CACHE[data["id"]] = Channel(
             metadata=ChannelMetadata(**data["metadata"]),
             messages=[await self.parent.messages.import_message(m) for m in data["messages"]],
             id=data["id"],
             last_loaded=round(time.time())
         )
+
+        await self.save(self.CACHE[data["id"]])
         return self.CACHE[data["id"]] 
 
     async def _unload(self, channel: Channel):
         print("UNLOADING", channel.id)
         await self.save(channel)
         del self.CACHE[channel.id]
+        #Make sure to delete the journaling file if any
+        if channel.id in self._journal_cache:
+            io_obj = self._journal_cache[channel.id]
+            io_obj.flush()
+            io_obj.close()
+            os.remove(Path(io_obj.name).resolve())
+            del self._journal_cache[channel.id]
 
     async def _load_loop(self):
         for _, channel in self.CACHE.copy().items():

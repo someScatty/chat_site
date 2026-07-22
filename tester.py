@@ -27,7 +27,7 @@ class ChatCLI:
         password = "1234"
 
         r = requests.post(
-            f"{BASE_URL}/api/login/{username}",
+            f"{BASE_URL}/api/login",
             json={
                 "username": username,
                 "password": password
