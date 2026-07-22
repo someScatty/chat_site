@@ -159,7 +159,7 @@ async def on_new_channel(request: NewChannel, user: HTTPAuthorizationCredentials
 
 if __name__ == "__main__":
 
-
+    chat.users.create_user("moakdoge", "1234")
     uvicorn.run(
         app=app,
         host=chat.config.host,

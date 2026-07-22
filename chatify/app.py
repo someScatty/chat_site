@@ -19,13 +19,13 @@ class ChatApp:
         self._on_shutdown: list[Callable] = []
         self._registered_tasks: list[AsyncTask] = []
 
-
-        self.config = chatify.api.config.Config(base, self)
+        self.security = chatify.api.security.SecurityLib(self)
+        self.config = chatify.api.config.Config(base, self) # type: ignore
         self.channels = chatify.api.channel.ChannelSubsystem(self)
         self.messages = chatify.api.messages.MessageLib(self)
         self.files = chatify.api.files.FileManager(self)
         self.users = chatify.api.users.UserManager(self)
-        self.security = chatify.api.security.SecurityLib(self)
+
 
 
 

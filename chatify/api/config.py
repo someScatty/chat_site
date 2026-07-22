@@ -1,6 +1,7 @@
 import os, json
 from dataclasses import dataclass
 from pathlib import Path
+import uuid
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -36,6 +37,11 @@ class Config:
                 new[key] = value
         return new
     
+    def make_temp_file(self, file: Path) -> Path:
+        '''Generates a temp file'''
+        name = file.name + "-" + str(self._parent.security.hash(data=file.name, hash_type='crc32')) + ".tmp"
+        return Path(file.parent / name).resolve()
+
     def save_custom(
             self, 
             file: str | Path,
@@ -44,19 +50,45 @@ class Config:
 
         fi = (self._folder / file)
         fi.parent.mkdir(exist_ok=True, parents=True)
-        with open(fi, "w") as f:
-            dumped = json.dumps(data, indent=2 if self.debug else 0)
-            f.write(dumped)        
+
+        print("SAVING")
+        #making it atomic
+        tempfile = self.make_temp_file(fi)
+        with open(tempfile, "w") as f:
+            contents = json.dumps(data, indent=2 if self.debug else 0)
+            f.write(contents)
+            f.flush()
+            os.fsync(f.fileno())
+
+        os.replace(tempfile, fi)
+
+    def _load_contents(self, data: bytes) -> dict:
+        '''Loads contents'''
+        txt = data.decode(encoding="utf-8")
+        return json.loads(txt)
 
     def load_custom(
             self, 
             file: str | Path,
             ) -> dict:
         '''Loads a custom file'''
+
+        fixed_file = (self._folder / file).resolve()
+        tmp_file = self.make_temp_file(fixed_file)
+
+
+
         if not (self._folder / file).exists():
+            if tmp_file.exists():
+                print(f"[WARNING]: loading off {tmp_file}")
+                contents = tmp_file.read_bytes()
+                os.replace(tmp_file, fixed_file)
+                return self._load_contents(contents)
             return {}
-        with open(self._folder / file, "r") as f:
-            return json.load(f)
+        
+        
+        with open(self._folder / file, "rb") as f:
+            return self._load_contents(f.read())
                  
     def __init__(self, base: Path, parent: "ChatApp", debug: bool = False) -> None:
         parent.on_exit(self._on_exit)
