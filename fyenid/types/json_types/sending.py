@@ -12,7 +12,8 @@ class SendRequest(BaseModel):
     )
 
     reply: MessageID | None = Field(
-        description="The message ID to respond to, if any."
+        description="The message ID to respond to, if any.",
+        default=None
     )
 
 class EditRequest(BaseModel):

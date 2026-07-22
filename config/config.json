@@ -1,6 +1,6 @@
 {
   "host": "0.0.0.0",
-  "lazy_load_time": 3,
+  "lazy_load_time": 300,
   "timeout": 1800,
   "port": 8000,
   "debug": true,

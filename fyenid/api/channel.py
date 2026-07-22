@@ -115,8 +115,10 @@ class ChannelSubsystem:
                         msg = json.loads(line)
                         id = msg["id"]
                         chan, ind = self.parent.messages._get_message_info_from_id(id) 
-                        message_contents[ind] = msg
-
+                        if ind < len(message_contents):
+                            message_contents[ind] = msg
+                        else:
+                            message_contents.append(msg) # type: ignore
                     except json.JSONDecodeError:
                         self.parent.console.error("Failed to load message",i,"(corrupted)")
             os.remove(tmpjournal)
