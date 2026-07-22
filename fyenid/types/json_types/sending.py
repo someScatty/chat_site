@@ -11,6 +11,10 @@ class SendRequest(BaseModel):
         description="The user ID of the sender; Is validated.",
     )
 
+    reply: MessageID | None = Field(
+        description="The message ID to respond to, if any."
+    )
+
 class EditRequest(BaseModel):
     content: str = Field(
         description="The content to send in the message.",
